@@ -4794,7 +4794,8 @@ class TmpBotPlugin(Star):
       bounds: { x:131072, y:131072 },
       maxZoom: 8, minZoom: 2,
       calc: function(xx, yy) {
-        return [ xx / 1.609055, yy / 1.609055 ];
+        var x1 = -113177.305, x2 = 97925.63, y1 = -122648.086, y2 = 88454.85;
+        return [ (xx - x1) / (x2 - x1) * 131072, (yy - y1) / (y2 - y1) * 131072 ];
       }
     },
     promods: {
@@ -5396,7 +5397,8 @@ class TmpBotPlugin(Star):
       bounds: { x:131072, y:131072 },
       maxZoom: 8, minZoom: 2,
       calc: function(xx, yy) {
-        return [ xx / 1.609055, yy / 1.609055 ];
+        var x1 = -113177.305, x2 = 97925.63, y1 = -122648.086, y2 = 88454.85;
+        return [ (xx - x1) / (x2 - x1) * 131072, (yy - y1) / (y2 - y1) * 131072 ];
       }
     },
     promods: {
@@ -6312,7 +6314,7 @@ class TmpBotPlugin(Star):
     ets: {
       fallbackUrl:'https://ets_tiles.cnly.top/20260903/tmp-ets-yellow/Tiles/{z}/{x}/{y}.png',
       bounds:{x:131072,y:131072}, maxZoom:8, minZoom:2,
-      calc:function(xx,yy){return [xx/1.609055,yy/1.609055];}
+      calc:function(xx,yy){var x1=-113177.305,x2=97925.63,y1=-122648.086,y2=88454.85;return [(xx-x1)/(x2-x1)*131072,(yy-y1)/(y2-y1)*131072];}
     },
     promods: {
       fallbackUrl:'https://ets2.online/map/ets2mappromods_156/{z}/{x}/{y}.png',
