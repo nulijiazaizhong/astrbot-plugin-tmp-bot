@@ -3,7 +3,7 @@
 
 """
 astrbot-plugin-tmp-bot
-欧卡2TMP查询插件 (版本 1.9.4)
+欧卡2TMP查询插件 (版本 1.9.5)
 """
 
 import re
@@ -117,344 +117,191 @@ FOOTPRINT_RENDER_REVISION = "2026-10-31-r5"
 
 RANK_IMAGE_TEMPLATE = """
 <style>
-  html, body {
-    width: 760px;
-    margin: 0;
-    padding: 0;
-    background: #070b12;
-  }
-  * { box-sizing: border-box; }
+  html, body { width:760px; margin:0; padding:0; background:#101214; }
+  * { box-sizing:border-box; }
   .board {
-    --accent: #55e0b0;
-    --accent-soft: rgba(85, 224, 176, .16);
-    --accent-line: rgba(85, 224, 176, .42);
-    position: relative;
-    width: 760px;
-    overflow: hidden;
-    padding: 28px 28px 24px;
-    color: #f7f9fc;
-    font-family: "Segoe UI", "Microsoft YaHei UI", sans-serif;
-    background:
-      radial-gradient(circle at 90% 4%, rgba(65, 171, 255, .18), transparent 28%),
-      radial-gradient(circle at 5% 48%, rgba(85, 224, 176, .12), transparent 30%),
-      linear-gradient(150deg, #0d1523 0%, #09101b 48%, #070b12 100%);
+    --accent:#e65b64;
+    width:760px;
+    overflow:hidden;
+    padding:28px 28px 24px;
+    color:#efede8;
+    font-family:"Segoe UI","Microsoft YaHei UI",sans-serif;
+    background:#101214;
   }
-  .board.today {
-    --accent: #ffbd63;
-    --accent-soft: rgba(255, 189, 99, .16);
-    --accent-line: rgba(255, 189, 99, .42);
-  }
-  .board::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: .34;
-    background-image:
-      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-    background-size: 38px 38px;
-    mask-image: linear-gradient(to bottom, black, transparent 78%);
-  }
-  .road-mark {
-    position: absolute;
-    right: -88px;
-    top: 105px;
-    width: 260px;
-    height: 420px;
-    border: 1px solid rgba(255,255,255,.07);
-    border-radius: 50%;
-    transform: rotate(24deg);
-  }
-  .road-mark::before,
-  .road-mark::after {
-    content: "";
-    position: absolute;
-    inset: 26px;
-    border: 1px dashed rgba(255,255,255,.09);
-    border-radius: 50%;
-  }
-  .road-mark::after { inset: 70px; }
   .hero {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 22px;
-    padding-bottom: 22px;
-    border-bottom: 1px solid rgba(255,255,255,.1);
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:24px;
+    padding-bottom:20px;
+    border-bottom:1px solid rgba(239,237,232,.1);
   }
-  .brand { display: flex; align-items: center; gap: 15px; min-width: 0; }
+  .brand { display:flex; align-items:center; gap:16px; min-width:0; }
   .brand-mark {
-    width: 54px;
-    height: 54px;
-    flex: 0 0 54px;
-    display: grid;
-    place-items: center;
-    border-radius: 17px;
-    color: #07121a;
-    font-size: 16px;
-    font-weight: 900;
-    letter-spacing: .5px;
-    background: linear-gradient(145deg, var(--accent), #e9fff8);
-    box-shadow: 0 10px 30px var(--accent-soft);
+    width:52px;
+    height:52px;
+    flex:0 0 52px;
+    display:grid;
+    place-items:center;
+    border-bottom:2px solid var(--accent);
+    border-radius:12px;
+    color:#17191c;
+    font-size:16px;
+    font-weight:600;
+    background:#efede8;
   }
-  .eyebrow {
-    margin-bottom: 5px;
-    color: var(--accent);
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 2.6px;
-    text-transform: uppercase;
-  }
-  h1 {
-    margin: 0;
-    font-size: 30px;
-    line-height: 1.15;
-    font-weight: 800;
-    letter-spacing: -.8px;
-  }
-  .hero-meta {
-    flex: 0 0 auto;
-    text-align: right;
-    padding-top: 3px;
-  }
+  .eyebrow { margin-bottom:4px; color:#a4a5a8; font-size:12px; font-weight:400; }
+  h1 { margin:0; font-size:30px; line-height:1.2; font-weight:500; }
+  .hero-meta { flex:0 0 auto; padding-top:4px; text-align:right; }
   .hero-meta strong {
-    display: block;
-    color: #fff;
-    font-family: "Cascadia Mono", Consolas, monospace;
-    font-size: 23px;
-    line-height: 1;
-    letter-spacing: -.5px;
+    display:block;
+    font-family:"Cascadia Mono",Consolas,monospace;
+    font-size:24px;
+    line-height:1;
+    font-weight:500;
+    font-variant-numeric:tabular-nums;
   }
-  .hero-meta span {
-    display: block;
-    margin-top: 6px;
-    color: #8190a5;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.8px;
-  }
+  .hero-meta span { display:block; margin-top:8px; color:#85878b; font-size:12px; }
   .section-label {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    margin: 18px 2px 10px;
-    color: #8592a5;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 2.2px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:20px 0 12px;
+    color:#85878b;
+    font-size:12px;
+    font-weight:400;
   }
-  .section-label::after {
-    content: "";
-    height: 1px;
-    flex: 1;
-    background: linear-gradient(90deg, rgba(255,255,255,.13), transparent);
-  }
-  .champion,
-  .runner-card,
-  .row,
-  .me-card {
-    position: relative;
-    z-index: 1;
-    overflow: hidden;
-    border: 1px solid rgba(255,255,255,.09);
-    background: rgba(18, 28, 43, .88);
-    box-shadow: 0 12px 34px rgba(0,0,0,.19);
+  .section-label::after { content:""; height:1px; flex:1; background:rgba(239,237,232,.1); }
+  .champion,.runner-card,.row,.me-card {
+    position:relative;
+    overflow:hidden;
+    border:1px solid rgba(239,237,232,.09);
+    background:#181b1f;
   }
   .champion {
-    display: grid;
-    grid-template-columns: 76px minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 17px;
-    padding: 19px 21px;
-    border-radius: 18px;
-    border-color: rgba(246, 196, 83, .42);
-    background:
-      linear-gradient(110deg, rgba(246,196,83,.17), rgba(246,196,83,.035) 46%, rgba(18,28,43,.92)),
-      rgba(18,28,43,.95);
-  }
-  .champion::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: linear-gradient(#ffe49b, #f0a72f);
-    box-shadow: 0 0 22px rgba(246,196,83,.7);
-  }
-  .champion::after {
-    content: "01";
-    position: absolute;
-    right: 14px;
-    bottom: -18px;
-    color: rgba(255,255,255,.035);
-    font-family: "Cascadia Mono", Consolas, monospace;
-    font-size: 92px;
-    font-weight: 900;
-    letter-spacing: -8px;
+    display:grid;
+    grid-template-columns:72px minmax(0,1fr) auto;
+    align-items:center;
+    gap:20px;
+    padding:20px;
+    border-radius:16px;
+    border-color:rgba(216,172,98,.36);
   }
   .medal {
-    width: 60px;
-    height: 60px;
-    display: grid;
-    place-items: center;
-    border-radius: 18px;
-    border: 1px solid rgba(255,255,255,.16);
-    background: rgba(255,255,255,.08);
-    font-family: "Cascadia Mono", Consolas, monospace;
-    font-size: 24px;
-    font-weight: 900;
+    width:56px;
+    height:56px;
+    display:grid;
+    place-items:center;
+    border-radius:12px;
+    color:#c7c9cc;
+    background:#23262b;
+    font-family:"Cascadia Mono",Consolas,monospace;
+    font-size:20px;
+    font-weight:500;
+    font-variant-numeric:tabular-nums;
   }
-  .champion .medal {
-    color: #191204;
-    border: 0;
-    background: linear-gradient(145deg, #ffe7a2, #e7a531);
-    box-shadow: 0 9px 24px rgba(240,167,47,.27);
-  }
-  .player { min-width: 0; }
+  .champion .medal { color:#211b11; background:#d8ac62; }
+  .player { min-width:0; }
   .player-name {
-    overflow: hidden;
-    color: #f8fafc;
-    font-size: 18px;
-    font-weight: 800;
-    line-height: 1.25;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow:hidden;
+    font-size:18px;
+    font-weight:500;
+    line-height:1.3;
+    text-overflow:ellipsis;
+    white-space:nowrap;
   }
   .player-id {
-    margin-top: 4px;
-    color: #8190a5;
-    font-family: "Cascadia Mono", Consolas, monospace;
-    font-size: 10px;
-    letter-spacing: .7px;
+    margin-top:4px;
+    color:#85878b;
+    font-family:"Cascadia Mono",Consolas,monospace;
+    font-size:12px;
+    font-variant-numeric:tabular-nums;
   }
-  .mileage {
-    position: relative;
-    z-index: 1;
-    text-align: right;
-    white-space: nowrap;
-  }
+  .mileage { text-align:right; white-space:nowrap; }
   .mileage strong {
-    display: block;
-    font-family: "Cascadia Mono", Consolas, monospace;
-    font-size: 22px;
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
+    display:block;
+    font-family:"Cascadia Mono",Consolas,monospace;
+    font-size:24px;
+    line-height:1;
+    font-weight:500;
+    font-variant-numeric:tabular-nums;
   }
-  .mileage span {
-    display: block;
-    margin-top: 5px;
-    color: #8290a3;
-    font-size: 9px;
-    font-weight: 800;
-    letter-spacing: 1.6px;
-  }
-  .runner-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 10px;
-  }
+  .mileage span { display:block; margin-top:8px; color:#85878b; font-size:12px; }
+  .runner-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
   .runner-card {
-    display: grid;
-    grid-template-columns: 48px minmax(0, 1fr);
-    align-items: center;
-    gap: 12px;
-    padding: 14px;
-    border-radius: 15px;
+    display:grid;
+    grid-template-columns:48px minmax(0,1fr);
+    align-items:center;
+    gap:12px;
+    padding:16px;
+    border-radius:12px;
   }
-  .runner-card.silver { border-color: rgba(194,207,222,.28); }
-  .runner-card.bronze { border-color: rgba(226,153,91,.28); }
-  .runner-card .medal { width: 44px; height: 44px; border-radius: 14px; font-size: 17px; }
-  .runner-card.silver .medal { color: #17212d; background: linear-gradient(145deg, #edf3f9, #aab9ca); }
-  .runner-card.bronze .medal { color: #24150a; background: linear-gradient(145deg, #f3bd8c, #c9783d); }
-  .runner-card .player-name { font-size: 14px; }
-  .runner-card .mileage { grid-column: 2; text-align: left; margin-top: -4px; }
-  .runner-card .mileage strong { color: #dce5f0; font-size: 15px; }
-  .runner-card .mileage span { display: none; }
-  .rows { display: grid; gap: 7px; }
+  .runner-card .medal { width:44px; height:44px; border-radius:8px; font-size:16px; }
+  .runner-card .player-name { font-size:14px; }
+  .runner-card .mileage { grid-column:2; text-align:left; }
+  .runner-card .mileage strong { color:#d4d5d6; font-size:16px; }
+  .runner-card .mileage span { display:none; }
+  .rows { display:grid; gap:8px; }
   .row {
-    display: grid;
-    grid-template-columns: 40px minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 12px;
-    padding: 11px 14px;
-    border-radius: 12px;
-    background: rgba(17, 27, 41, .74);
+    display:grid;
+    grid-template-columns:40px minmax(0,1fr) auto;
+    align-items:center;
+    gap:12px;
+    padding:12px 16px;
+    border-radius:12px;
+    background:#15181b;
   }
   .row-rank {
-    color: #8c9aae;
-    font-family: "Cascadia Mono", Consolas, monospace;
-    font-size: 13px;
-    font-weight: 800;
+    color:#a4a5a8;
+    font-family:"Cascadia Mono",Consolas,monospace;
+    font-size:13px;
+    font-weight:500;
+    font-variant-numeric:tabular-nums;
   }
-  .row .player-name { font-size: 14px; font-weight: 700; }
-  .row .player-id { margin-top: 2px; }
-  .row .mileage strong { font-size: 14px; }
+  .row .player-name { font-size:14px; }
+  .row .player-id { margin-top:4px; }
+  .row .mileage strong { font-size:14px; }
   .me-card {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 16px;
-    margin-top: 18px;
-    padding: 15px 17px;
-    border-radius: 16px;
-    border-color: var(--accent-line);
-    background:
-      linear-gradient(105deg, var(--accent-soft), rgba(16,26,40,.88) 72%),
-      rgba(16,26,40,.95);
-    box-shadow: inset 0 0 0 1px var(--accent-soft);
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:16px;
+    margin-top:16px;
+    padding:16px 16px 16px 20px;
+    border-radius:12px;
+    background:#1c1f23;
   }
-  .me-label {
-    margin-bottom: 6px;
-    color: var(--accent);
-    font-size: 9px;
-    font-weight: 900;
-    letter-spacing: 2.2px;
-  }
-  .me-name { font-size: 15px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .me-sub { margin-top: 5px; color: #8d9aad; font-size: 11px; }
-  .me-values { text-align: right; white-space: nowrap; }
+  .me-card::before { content:""; position:absolute; left:0; top:16px; bottom:16px; width:2px; background:var(--accent); }
+  .me-label { margin-bottom:4px; color:#e65b64; font-size:12px; font-weight:500; }
+  .me-name { overflow:hidden; font-size:16px; font-weight:500; text-overflow:ellipsis; white-space:nowrap; }
+  .me-sub { margin-top:4px; color:#85878b; font-size:12px; }
+  .me-values { text-align:right; white-space:nowrap; }
   .me-values strong {
-    display: block;
-    color: var(--accent);
-    font-family: "Cascadia Mono", Consolas, monospace;
-    font-size: 19px;
+    display:block;
+    color:#efede8;
+    font-family:"Cascadia Mono",Consolas,monospace;
+    font-size:20px;
+    font-weight:500;
+    font-variant-numeric:tabular-nums;
   }
-  .me-values span {
-    display: block;
-    margin-top: 4px;
-    color: #c3cedd;
-    font-size: 11px;
-    font-weight: 700;
-  }
+  .me-values span { display:block; margin-top:4px; color:#a4a5a8; font-size:12px; }
   .footer {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 15px;
-    padding-top: 12px;
-    border-top: 1px solid rgba(255,255,255,.08);
-    color: #59677a;
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 1.1px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:16px;
+    padding-top:12px;
+    border-top:1px solid rgba(239,237,232,.08);
+    color:#85878b;
+    font-size:12px;
   }
-  .footer b { color: var(--accent); font-weight: 800; }
+  .footer b { color:#a4a5a8; font-weight:500; }
 </style>
 <div class="board {{ 'today' if is_today else 'total' }}">
-  <div class="road-mark"></div>
   <header class="hero">
     <div class="brand">
       <div class="brand-mark">TMP</div>
       <div>
-        <div class="eyebrow">TRUCKERSMP · ETS2</div>
+        <div class="eyebrow">TruckersMP · ETS2</div>
         <h1>{{ title|e }}</h1>
       </div>
     </div>
@@ -465,7 +312,7 @@ RANK_IMAGE_TEMPLATE = """
   </header>
 
   {% if items|length > 0 %}
-  <div class="section-label">CHAMPION</div>
+  <div class="section-label">第 1 名</div>
   <div class="champion">
     <div class="medal">01</div>
     <div class="player">
@@ -474,7 +321,7 @@ RANK_IMAGE_TEMPLATE = """
     </div>
     <div class="mileage">
       <strong>{{ items[0].km_text|e }}</strong>
-      <span>KILOMETERS</span>
+      <span>公里</span>
     </div>
   </div>
   {% endif %}
@@ -487,7 +334,7 @@ RANK_IMAGE_TEMPLATE = """
         <div class="player-name">{{ items[1].name|e }}</div>
         <div class="player-id">TMP ID · {{ items[1].tmp_id|e }}</div>
       </div>
-      <div class="mileage"><strong>{{ items[1].km_text|e }}</strong><span>KM</span></div>
+      <div class="mileage"><strong>{{ items[1].km_text|e }}</strong><span>km</span></div>
     </div>
     {% if items|length > 2 %}
     <div class="runner-card bronze">
@@ -496,7 +343,7 @@ RANK_IMAGE_TEMPLATE = """
         <div class="player-name">{{ items[2].name|e }}</div>
         <div class="player-id">TMP ID · {{ items[2].tmp_id|e }}</div>
       </div>
-      <div class="mileage"><strong>{{ items[2].km_text|e }}</strong><span>KM</span></div>
+      <div class="mileage"><strong>{{ items[2].km_text|e }}</strong><span>km</span></div>
     </div>
     {% endif %}
   </div>
@@ -504,16 +351,16 @@ RANK_IMAGE_TEMPLATE = """
 
   {% set remaining = items|length - 3 %}
   {% if remaining > 0 %}
-  <div class="section-label">LEADERBOARD · 04–{{ items|length }}</div>
+  <div class="section-label">第 4–{{ items|length }} 名</div>
   <div class="rows">
     {% for it in items if it.rank > 3 %}
     <div class="row">
-      <div class="row-rank">{{ '%02d' % it.rank|e }}</div>
+      <div class="row-rank">{{ '%02d' % it.rank }}</div>
       <div>
         <div class="player-name">{{ it.name|e }}</div>
         <div class="player-id">TMP ID · {{ it.tmp_id|e }}</div>
       </div>
-      <div class="mileage"><strong>{{ it.km_text|e }}</strong><span>KM</span></div>
+      <div class="mileage"><strong>{{ it.km_text|e }}</strong><span>km</span></div>
     </div>
     {% endfor %}
   </div>
@@ -522,20 +369,20 @@ RANK_IMAGE_TEMPLATE = """
   {% if me %}
   <div class="me-card">
     <div>
-      <div class="me-label">MY POSITION</div>
+      <div class="me-label">我的排名</div>
       <div class="me-name">{{ me.name|e }}</div>
       <div class="me-sub">TMP ID · {{ me.tmp_id|e }}{% if me.vtc_role %} · {{ me.vtc_role|e }}{% endif %}</div>
     </div>
     <div class="me-values">
-      <strong>{{ me.km_text|e }} KM</strong>
-      <span>{% if me.rank is not none %}RANK #{{ me.rank }}{% else %}{{ scope|e }}{% endif %}</span>
+      <strong>{{ me.km_text|e }} km</strong>
+      <span>{% if me.rank is not none %}第 {{ me.rank }} 名{% else %}{{ scope|e }}{% endif %}</span>
     </div>
   </div>
   {% endif %}
 
   <footer class="footer">
-    <span><b>LIVE DATA</b> · TRUCKERSMP MILEAGE</span>
-    <span>{{ scope|e }} · TOP 10</span>
+    <span><b>实时数据</b> · TruckersMP 里程</span>
+    <span>{{ scope|e }} · 前 10 名</span>
   </footer>
 </div>
 """
@@ -704,7 +551,7 @@ def _is_hidden_ban_expiry(value: Any) -> bool:
         'hidden by player', 'hidden by user',
     }
 
-@register("tmp-bot", "BGYdook", "欧卡2TMP查询插件", "1.9.4", "https://github.com/BGYdook/astrbot-plugin-tmp-bot")
+@register("tmp-bot", "BGYdook", "欧卡2TMP查询插件", "1.9.5", "https://github.com/BGYdook/astrbot-plugin-tmp-bot")
 class TmpBotPlugin(Star):
     def __init__(self, context, config=None):  # 接收 context 和 config
         super().__init__(context)              # 将 context 传给父类
@@ -859,7 +706,7 @@ class TmpBotPlugin(Star):
         # 使用 IPv4 优先的连接器，并允许读取环境代理设置（与浏览器/系统行为更一致）
         connector = aiohttp.TCPConnector(family=socket.AF_INET)
         self.session = aiohttp.ClientSession(
-            headers={'User-Agent': 'astrBot-TMP-Plugin/1.9.4'}, 
+            headers={'User-Agent': 'astrBot-TMP-Plugin/1.9.5'},
             timeout=aiohttp.ClientTimeout(total=timeout_sec),
             connector=connector,
             trust_env=True
@@ -4203,27 +4050,51 @@ class TmpBotPlugin(Star):
             logger.info("DLC列表: 尝试进行图片渲染(html_render)")
             tmpl = """
 <style>
-  html, body { margin:0; padding:0; background:#222d33; width:auto; }
-  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; width:760px; background:#101214; }
+  * { box-sizing:border-box; }
+  .dlc-list {
+    width:760px; padding:24px; color:#efede8; background:#101214;
+    font-family:"Segoe UI","Microsoft YaHei UI",sans-serif;
+  }
+  .dlc-title { margin:0 0 20px; font-size:24px; line-height:32px; font-weight:500; }
+  .dlc-title::after { content:""; display:block; width:28px; height:2px; margin-top:8px; background:#e65b64; }
+  .dlc-grid { display:grid; gap:12px; }
+  .dlc-card {
+    display:flex; gap:16px; padding:16px; overflow:hidden;
+    border:1px solid rgba(239,237,232,.09); border-radius:12px; background:#181b1f;
+  }
+  .dlc-image { width:216px; height:100px; flex:0 0 216px; border-radius:8px; object-fit:cover; background:#23262b; }
+  .dlc-meta { flex:1; min-width:0; }
+  .dlc-name { overflow:hidden; font-size:16px; line-height:24px; font-weight:500; text-overflow:ellipsis; white-space:nowrap; }
+  .dlc-desc {
+    display:-webkit-box; margin-top:4px; overflow:hidden; color:#a4a5a8; font-size:13px; line-height:20px;
+    -webkit-line-clamp:2; -webkit-box-orient:vertical; text-overflow:ellipsis;
+  }
+  .dlc-price { display:flex; align-items:baseline; gap:12px; margin-top:8px; font-variant-numeric:tabular-nums; }
+  .dlc-now { font-size:16px; font-weight:500; }
+  .dlc-old { color:#85878b; font-size:13px; text-decoration:line-through; }
+  .dlc-off { color:#e65b64; font-size:13px; }
 </style>
-<div style=\"width:100vw;background:#222d33;color:#fff;font-family:system-ui,Segoe UI,Helvetica,Arial,sans-serif;\">
-  <div style=\"font-size:20px;font-weight:600;margin:0;padding:12px 0 8px 0;\">DLC 列表</div>
-  {% for it in items %}
-  <div style=\"display:flex;flex-direction:row;background:#24313a;margin:0 0 12px 0;padding:12px;\">
-    <img src=\"{{ it.headerImageUrl|e }}\" style=\"width:210px;height:auto;object-fit:cover;\"/>
-    <div style=\"flex:1;padding:0 12px;\">
-      <div style=\"font-size:18px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;\">{{ it.name|e }}</div>
-      <div style=\"font-size:14px;color:#e5e5e5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;\">{{ it.desc|e }}</div>
-      <div style=\"margin-top:8px;\">
-        <span style=\"display:inline-block;color:#BEEE11;font-size:16px;\">{{ it.price_str|e }}</span>
-        {% if it.discount and it.discount > 0 %}
-        <span style=\"display:inline-block;color:#cbcbcb;font-size:16px;text-decoration:line-through;margin-left:6px;\">{{ it.original_price_str|e }}</span>
-        <span style=\"font-size:14px;color:#BEEE11;background:#4c6b22;padding:2px 6px;margin-left:4px;\">-{{ it.discount|e }}%</span>
-        {% endif %}
+<div class="dlc-list">
+  <div class="dlc-title">DLC 列表</div>
+  <div class="dlc-grid">
+    {% for it in items %}
+    <div class="dlc-card">
+      <img class="dlc-image" src="{{ it.headerImageUrl|e }}" alt="" />
+      <div class="dlc-meta">
+        <div class="dlc-name">{{ it.name|e }}</div>
+        <div class="dlc-desc">{{ it.desc|e }}</div>
+        <div class="dlc-price">
+          <span class="dlc-now">{{ it.price_str|e }}</span>
+          {% if it.discount and it.discount > 0 %}
+          <span class="dlc-old">{{ it.original_price_str|e }}</span>
+          <span class="dlc-off">-{{ it.discount|e }}%</span>
+          {% endif %}
+        </div>
       </div>
     </div>
+    {% endfor %}
   </div>
-  {% endfor %}
 </div>
 """
             mapped: List[Dict[str, Any]] = []
@@ -4685,71 +4556,51 @@ class TmpBotPlugin(Star):
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-  html, body { margin:0; padding:0; width:1280px; height:720px; background:#244b63; overflow:hidden; }
+  html, body { margin:0; padding:0; width:1280px; height:720px; background:#181d23; overflow:hidden; }
   * { box-sizing:border-box; }
   body { font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif; }
-  .shell { position:relative; width:1280px; height:720px; overflow:hidden; color:#f5fbfa; background:#244b63; }
-  .map-stage { position:relative; width:100%; height:100%; overflow:hidden; background:radial-gradient(circle at 52% 40%,#365f76 0,#294f66 52%,#1b3b51 100%); }
+  .shell { position:relative; width:1280px; height:720px; overflow:hidden; color:#eef0f2; background:#181d23; }
+  .map-stage { position:relative; width:100%; height:100%; overflow:hidden; background:#26323d; }
   #map { position:absolute; inset:0; background:transparent; }
-  #map .leaflet-tile-pane {
-    opacity:.82; filter:grayscale(1) brightness(1.75) contrast(1.12);
-    mix-blend-mode:screen;
-  }
+  #map .leaflet-tile-pane { opacity:.9; filter:saturate(.65) brightness(.82) contrast(1.08); }
   .leaflet-control-container { display:none; }
-  .map-stage::after {
-    content:""; position:absolute; inset:0; z-index:450; pointer-events:none;
-    background:
-      linear-gradient(180deg,rgba(7,29,45,.18) 0,rgba(7,29,45,0) 22%,rgba(7,29,45,0) 66%,rgba(7,29,45,.38) 100%),
-      radial-gradient(circle at 52% 45%,transparent 50%,rgba(8,30,45,.24) 100%);
-  }
   .route-tooltip {
-    border:none!important; border-radius:9px!important; background:#f8f6ef!important; color:#172625!important;
-    box-shadow:0 8px 22px rgba(0,0,0,.2)!important; font-size:11px!important; font-weight:700!important;
+    border:none!important; border-radius:8px!important; background:#efede8!important; color:#1d2024!important;
+    box-shadow:0 8px 24px rgba(0,0,0,.2)!important; font-size:12px!important; font-weight:500!important;
   }
-  .route-tooltip::before { border-top-color:#f8f6ef!important; }
+  .route-tooltip::before { border-top-color:#efede8!important; }
   .panel {
-    position:absolute; z-index:900; left:28px; right:28px; bottom:24px; height:112px;
-    padding:0 28px; display:grid; grid-template-columns:minmax(0,1fr) 280px;
-    gap:18px; align-items:center; border:1px solid rgba(255,255,255,.16); border-radius:20px;
-    background:linear-gradient(105deg,rgba(7,28,45,.94),rgba(8,36,55,.88));
-    box-shadow:0 18px 45px rgba(6,25,39,.34); backdrop-filter:blur(14px);
+    position:absolute; z-index:900; left:24px; right:24px; bottom:24px; height:112px;
+    padding:0 24px; display:grid; grid-template-columns:minmax(0,1fr) 280px;
+    gap:24px; align-items:center; border:1px solid rgba(238,240,242,.1); border-radius:16px;
+    background:#14171c;
   }
-  .panel::before {
-    content:""; position:absolute; left:22px; right:22px; top:0; height:1px;
-    background:linear-gradient(90deg,transparent,rgba(121,213,255,.7),transparent);
-  }
-  .profile { min-width:0; display:flex; align-items:center; gap:15px; }
-  .avatar-wrap {
-    width:72px; height:72px; flex:0 0 72px; padding:4px; border-radius:50%;
-    background:linear-gradient(145deg,#6bcfff,#267cad); box-shadow:0 8px 22px rgba(2,16,27,.38);
-  }
-  .avatar {
-    width:64px; height:64px; display:block; border:3px solid #102f45; border-radius:50%;
-    object-fit:cover; background:#d9e0dc;
-  }
+  .profile { min-width:0; display:flex; align-items:center; gap:16px; }
+  .avatar-wrap { width:64px; height:64px; flex:0 0 64px; border-radius:12px; background:#23272e; }
+  .avatar { width:64px; height:64px; display:block; border-radius:12px; object-fit:cover; background:#d9dcdf; }
   .avatar-fallback {
     width:64px; height:64px; display:flex; align-items:center; justify-content:center;
-    border:3px solid #102f45; border-radius:50%; color:#f8fffd;
-    background:linear-gradient(145deg,#237ca8,#123d59); font-size:26px; font-weight:800;
+    border-radius:12px; color:#eef0f2; background:#23272e; font-size:24px; font-weight:500;
   }
   .profile-copy { min-width:0; flex:1; }
-  .profile-kicker { margin-bottom:5px; color:#8bb1c3; font-size:10px; font-weight:800; letter-spacing:1.35px; }
+  .profile-kicker { display:flex; align-items:center; gap:8px; margin-bottom:4px; color:#a3a9b2; font-size:12px; }
+  .profile-kicker::before { content:""; width:16px; height:2px; background:#e65b64; }
   .name-line { display:flex; align-items:baseline; min-width:0; max-width:100%; }
   .name {
-    min-width:0; max-width:380px; overflow:hidden; color:#f7fbfc; font-size:24px; line-height:1.18;
-    font-weight:800; letter-spacing:-.4px; text-overflow:ellipsis; white-space:nowrap;
+    min-width:0; max-width:380px; overflow:hidden; font-size:24px; line-height:1.2;
+    font-weight:500; text-overflow:ellipsis; white-space:nowrap;
   }
-  .name-suffix { flex:0 0 auto; color:#afc8d4; font-size:17px; font-weight:600; letter-spacing:0; white-space:nowrap; }
-  .chips { display:flex; align-items:center; gap:7px; margin-top:8px; }
+  .name-suffix { flex:0 0 auto; color:#a3a9b2; font-size:16px; font-weight:400; white-space:nowrap; }
+  .chips { display:flex; align-items:center; gap:16px; margin-top:8px; }
   .chip {
-    display:inline-flex; align-items:center; height:22px; padding:0 9px; border-radius:7px;
-    color:#c1d8e3; background:rgba(255,255,255,.08); font-size:10px; font-weight:700; letter-spacing:.35px;
+    display:inline-flex; align-items:center; color:#a3a9b2; background:transparent;
+    font-size:12px; font-weight:400; font-variant-numeric:tabular-nums;
   }
-  .chip.server { color:#78ddae; background:rgba(83,199,143,.13); }
+  .chip.server { color:#a3a9b2; }
   .mileage { display:flex; align-items:baseline; justify-content:flex-end; gap:16px; white-space:nowrap; }
-  .mileage span { color:#9bb6c4; font-size:14px; font-weight:600; }
-  .mileage strong { color:#8de4b0; font-size:29px; line-height:1; font-weight:800; letter-spacing:-.6px; }
-  .mileage small { margin-left:5px; color:#a7c6b7; font-size:13px; font-weight:600; letter-spacing:0; }
+  .mileage span { color:#a3a9b2; font-size:14px; }
+  .mileage strong { font-size:32px; line-height:1; font-weight:500; font-variant-numeric:tabular-nums; }
+  .mileage small { margin-left:4px; color:#a3a9b2; font-size:14px; font-weight:400; }
 </style>
 <div class="shell">
   <div class="map-stage">
@@ -4765,7 +4616,7 @@ class TmpBotPlugin(Star):
         {% endif %}
       </div>
       <div class="profile-copy">
-        <div class="profile-kicker">DRIVER JOURNEY</div>
+        <div class="profile-kicker">今日足迹</div>
         <div class="name-line">
           <div class="name">{{ player_name|e }}</div>
           <span class="name-suffix"> 的今日行驶足迹</span>
@@ -4898,8 +4749,8 @@ class TmpBotPlugin(Star):
     map.setView(focusLatlngs[0], 7);
   } else if (focusLatlngs.length > 1) {
     map.fitBounds(L.latLngBounds(focusLatlngs), {
-      paddingTopLeft: [48, 55],
-      paddingBottomRight: [48, 165],
+      paddingTopLeft: [48, 56],
+      paddingBottomRight: [48, 164],
       maxZoom: 8
     });
   }
@@ -5271,97 +5122,71 @@ class TmpBotPlugin(Star):
 <link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css\">
 <script src=\"https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js\"></script>
 <style>
-  html, body { margin:0; padding:0; width:1280px; height:720px; overflow:hidden; background:#244b63; }
+  html, body { margin:0; padding:0; width:1280px; height:720px; overflow:hidden; background:#181d23; }
   * { box-sizing:border-box; }
   body { font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif; }
-  .shell { position:relative; width:1280px; height:720px; overflow:hidden; color:#f5fbfa; background:#244b63; }
-  #map { position:absolute; inset:0; background:radial-gradient(circle at 52% 42%,#365f76 0,#294f66 52%,#1b3b51 100%); }
-  #map .leaflet-tile-pane { opacity:.82; filter:grayscale(1) brightness(1.75) contrast(1.12); mix-blend-mode:screen; }
+  .shell { position:relative; width:1280px; height:720px; overflow:hidden; color:#eef0f2; background:#181d23; }
+  #map { position:absolute; inset:0; background:#26323d; }
+  #map .leaflet-tile-pane { opacity:.9; filter:saturate(.65) brightness(.82) contrast(1.08); }
   .leaflet-control-container { display:none; }
-  .map-shade {
-    position:absolute; inset:0; z-index:450; pointer-events:none;
-    background:
-      linear-gradient(180deg,rgba(7,29,45,.15),transparent 24%,transparent 66%,rgba(7,29,45,.42)),
-      radial-gradient(circle at 50% 45%,transparent 48%,rgba(8,30,45,.22));
+  .live-pill,.server-pill {
+    position:absolute; z-index:700; top:24px; height:32px; padding:0 12px;
+    display:flex; align-items:center; gap:8px; border:1px solid rgba(238,240,242,.1);
+    border-radius:8px; color:#eef0f2; background:#14171c; font-size:12px; font-weight:400;
   }
-  .live-pill {
-    position:absolute; z-index:700; top:24px; left:26px; height:40px; padding:0 14px;
-    display:flex; align-items:center; gap:9px; border:1px solid rgba(255,255,255,.18);
-    border-radius:11px; color:#edf7fb; background:rgba(8,31,48,.8);
-    backdrop-filter:blur(10px); box-shadow:0 10px 24px rgba(0,0,0,.18);
-    font-size:11px; font-weight:800; letter-spacing:1px;
-  }
-  .live-dot {
-    width:8px; height:8px; border-radius:50%; background:#69d9ff;
-    box-shadow:0 0 0 4px rgba(105,217,255,.15),0 0 14px rgba(105,217,255,.75);
-  }
-  .server-pill {
-    position:absolute; z-index:700; top:24px; right:26px; height:40px; padding:0 14px;
-    display:flex; align-items:center; gap:8px; border:1px solid rgba(255,255,255,.17);
-    border-radius:11px; color:#dfecef; background:rgba(8,31,48,.8);
-    backdrop-filter:blur(10px); box-shadow:0 10px 24px rgba(0,0,0,.18);
-    font-size:11px; font-weight:700;
-  }
-  .server-pill::before { content:""; width:7px; height:7px; border-radius:50%; background:#59c98d; }
+  .live-pill { left:24px; }
+  .server-pill { right:24px; }
+  .live-dot { width:8px; height:8px; border-radius:50%; background:#4cc38a; }
   .self-ring {
     width:48px; height:48px; display:grid; place-items:center; border-radius:50%;
-    border:1px solid rgba(112,229,183,.45); background:rgba(80,199,154,.1);
-    box-shadow:0 0 0 9px rgba(80,199,154,.08);
+    border:1px solid rgba(76,195,138,.48); background:rgba(20,23,28,.72);
   }
   .self-ring::after {
-    content:""; width:15px; height:15px; border-radius:50%;
-    border:3px solid #f7fffc; background:#59c98d; box-shadow:0 4px 12px rgba(0,0,0,.35);
+    content:""; width:16px; height:16px; border-radius:50%;
+    border:3px solid #eef0f2; background:#4cc38a;
   }
   .panel {
-    position:absolute; z-index:900; left:24px; right:24px; bottom:20px; height:112px;
-    padding:0 25px; display:grid; grid-template-columns:minmax(0,1fr) 520px;
-    gap:24px; align-items:center; border:1px solid rgba(255,255,255,.16); border-radius:19px;
-    background:linear-gradient(105deg,rgba(7,28,45,.95),rgba(8,36,55,.9));
-    box-shadow:0 18px 45px rgba(6,25,39,.35); backdrop-filter:blur(14px);
+    position:absolute; z-index:900; left:24px; right:24px; bottom:24px; height:112px;
+    padding:0 24px; display:grid; grid-template-columns:minmax(0,1fr) 520px;
+    gap:24px; align-items:center; border:1px solid rgba(238,240,242,.1); border-radius:16px;
+    background:#14171c;
   }
-  .panel::before {
-    content:""; position:absolute; left:22px; right:22px; top:0; height:1px;
-    background:linear-gradient(90deg,transparent,rgba(121,213,255,.7),transparent);
-  }
-  .profile { min-width:0; display:flex; align-items:center; gap:15px; }
-  .avatar-wrap {
-    width:70px; height:70px; flex:0 0 70px; padding:4px; border-radius:50%;
-    background:linear-gradient(145deg,#6bcfff,#267cad); box-shadow:0 8px 22px rgba(2,16,27,.38);
-  }
-  .avatar { width:62px; height:62px; display:block; border:3px solid #102f45; border-radius:50%; object-fit:cover; background:#d8e0e3; }
+  .profile { min-width:0; display:flex; align-items:center; gap:16px; }
+  .avatar-wrap { width:64px; height:64px; flex:0 0 64px; border-radius:12px; background:#23272e; }
+  .avatar { width:64px; height:64px; display:block; border-radius:12px; object-fit:cover; background:#d9dcdf; }
   .avatar-fallback {
-    width:62px; height:62px; display:flex; align-items:center; justify-content:center;
-    border:3px solid #102f45; border-radius:50%; color:#f8fffd;
-    background:linear-gradient(145deg,#237ca8,#123d59); font-size:24px; font-weight:800;
+    width:64px; height:64px; display:flex; align-items:center; justify-content:center;
+    border-radius:12px; color:#eef0f2; background:#23272e; font-size:24px; font-weight:500;
   }
   .profile-copy { min-width:0; }
-  .profile-kicker { margin-bottom:5px; color:#8bb1c3; font-size:9px; font-weight:800; letter-spacing:1.4px; }
+  .profile-kicker { display:flex; align-items:center; gap:8px; margin-bottom:4px; color:#a3a9b2; font-size:12px; }
+  .profile-kicker::before { content:""; width:16px; height:2px; background:#e65b64; }
   .name {
-    max-width:330px; overflow:hidden; color:#f7fbfc; font-size:23px; line-height:1.15;
-    font-weight:800; letter-spacing:-.4px; text-overflow:ellipsis; white-space:nowrap;
+    max-width:330px; overflow:hidden; font-size:24px; line-height:1.2;
+    font-weight:500; text-overflow:ellipsis; white-space:nowrap;
   }
-  .chips { display:flex; align-items:center; gap:6px; margin-top:8px; }
+  .chips { display:flex; align-items:center; gap:16px; margin-top:8px; }
   .chip {
-    display:inline-flex; align-items:center; height:21px; padding:0 8px; border-radius:6px;
-    color:#c1d8e3; background:rgba(255,255,255,.08); font-size:9px; font-weight:700;
+    display:inline-flex; align-items:center; color:#a3a9b2; background:transparent;
+    font-size:12px; font-weight:400; font-variant-numeric:tabular-nums;
   }
-  .chip.server { color:#7ce0b1; background:rgba(83,199,143,.13); }
+  .chip.server { color:#a3a9b2; }
   .location-card { min-width:0; text-align:right; }
-  .location-label { color:#89a5b3; font-size:9px; font-weight:800; letter-spacing:1.4px; }
+  .location-label { color:#a3a9b2; font-size:12px; }
   .location-value {
-    margin-top:6px; overflow:hidden; color:#f6fbfc; font-size:21px; line-height:1.2;
-    font-weight:800; text-overflow:ellipsis; white-space:nowrap;
+    margin-top:4px; overflow:hidden; font-size:22px; line-height:1.25;
+    font-weight:500; text-overflow:ellipsis; white-space:nowrap;
   }
   .direction {
-    display:flex; justify-content:flex-end; align-items:center; gap:7px;
-    margin-top:7px; color:#7dd9b0; font-size:11px; font-weight:700;
+    display:flex; justify-content:flex-end; align-items:center; gap:8px;
+    margin-top:8px; color:#4cc38a; font-size:12px; font-weight:400;
   }
-  .direction::before { content:""; width:6px; height:6px; border-radius:50%; background:#59c98d; }
+  .direction::before { content:""; width:8px; height:8px; border-radius:50%; background:#4cc38a; }
 </style>
 <div class=\"shell\">
   <div id=\"map\"></div>
   <div class=\"map-shade\"></div>
-  <div class=\"live-pill\"><span class=\"live-dot\"></span>LIVE POSITION</div>
+  <div class=\"live-pill\"><span class=\"live-dot\"></span>实时位置</div>
   <div class=\"server-pill\">{{ server_name|e }} · 游戏中</div>
   <div class=\"panel\">
     <div class=\"profile\">
@@ -5369,7 +5194,7 @@ class TmpBotPlugin(Star):
         {% if avatar %}<img class=\"avatar\" src=\"{{ avatar|e }}\" />{% else %}<div class=\"avatar-fallback\">{{ avatar_initial|e }}</div>{% endif %}
       </div>
       <div class=\"profile-copy\">
-        <div class=\"profile-kicker\">DRIVER LOCATION</div>
+        <div class=\"profile-kicker\">玩家定位</div>
         <div class=\"name\">{{ player_name|e }}</div>
         <div class=\"chips\">
           <span class=\"chip server\">{{ server_name|e }}</span>
@@ -5604,7 +5429,7 @@ class TmpBotPlugin(Star):
             options = { 'type': 'jpeg', 'quality': 96, 'full_page': True, 'omit_background': False }
             url = await self.html_render(rank_tmpl, {
                 'title': '总里程排行榜',
-                'subtitle': 'ALL-TIME MILEAGE',
+                'subtitle': '累计里程',
                 'scope': '累计里程',
                 'is_today': False,
                 'items': items,
@@ -5739,7 +5564,7 @@ class TmpBotPlugin(Star):
             options = { 'type': 'jpeg', 'quality': 96, 'full_page': True, 'omit_background': False }
             url = await self.html_render(rank_tmpl, {
                 'title': '今日里程排行榜',
-                'subtitle': 'TODAY · RESET 00:00',
+                'subtitle': '今日里程',
                 'scope': '每日 0 点重置',
                 'is_today': True,
                 'items': items,
@@ -6208,68 +6033,55 @@ class TmpBotPlugin(Star):
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-  html, body { margin:0; padding:0; width:1280px; height:720px; overflow:hidden; background:#244b63; }
+  html, body { margin:0; padding:0; width:1280px; height:720px; overflow:hidden; background:#181d23; }
   * { box-sizing:border-box; }
   body { font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif; }
-  .shell { position:relative; width:1280px; height:720px; overflow:hidden; color:#f5fbfa; background:#244b63; }
-  .map-grid { display:grid; width:100%; height:100%; gap:5px; background:#122f43; }
+  .shell { position:relative; width:1280px; height:720px; overflow:hidden; color:#eef0f2; background:#181d23; }
+  .map-grid { display:grid; width:100%; height:100%; gap:4px; background:#14171c; }
   .map-grid.single { grid-template-columns:1fr; }
   .map-grid.dual { grid-template-columns:1fr 1fr; }
-  .map-pane { position:relative; overflow:hidden; background:radial-gradient(circle at 52% 40%,#365f76 0,#294f66 52%,#1b3b51 100%); }
+  .map-pane { position:relative; overflow:hidden; background:#26323d; }
   .map-canvas { position:absolute; inset:0; background:transparent; }
-  .map-canvas .leaflet-tile-pane { opacity:.82; filter:grayscale(1) brightness(1.75) contrast(1.12); mix-blend-mode:screen; }
+  .map-canvas .leaflet-tile-pane { opacity:.9; filter:saturate(.65) brightness(.82) contrast(1.08); }
   .leaflet-control-container { display:none; }
-  .map-pane::after {
-    content:""; position:absolute; inset:0; z-index:450; pointer-events:none;
-    background:linear-gradient(180deg,rgba(7,29,45,.15),transparent 25%,transparent 66%,rgba(7,29,45,.42));
-  }
-  .route-legend { position:absolute; z-index:700; top:18px; left:18px; display:flex; flex-wrap:wrap; gap:7px; }
+  .route-legend { position:absolute; z-index:700; top:24px; left:24px; display:flex; flex-wrap:wrap; gap:8px; }
   .legend-pill {
-    display:flex; align-items:center; gap:7px; height:27px; padding:0 10px;
-    border:1px solid rgba(255,255,255,.18); border-radius:8px; color:#eaf6fa;
-    background:rgba(8,31,48,.78); backdrop-filter:blur(9px); font-size:10px; font-weight:800;
+    display:flex; align-items:center; gap:8px; height:32px; padding:0 12px;
+    border:1px solid rgba(238,240,242,.1); border-radius:8px; color:#eef0f2;
+    background:#14171c; font-size:12px; font-weight:400;
   }
   .legend-pill i { width:8px; height:8px; border-radius:50%; }
   .panel {
-    position:absolute; z-index:900; left:24px; right:24px; bottom:20px; height:104px;
-    padding:0 25px; display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:18px; align-items:center;
-    border:1px solid rgba(255,255,255,.16); border-radius:19px;
-    background:linear-gradient(105deg,rgba(7,28,45,.95),rgba(8,36,55,.9));
-    box-shadow:0 18px 45px rgba(6,25,39,.35); backdrop-filter:blur(14px);
+    position:absolute; z-index:900; left:24px; right:24px; bottom:24px; height:112px;
+    padding:0 24px; display:grid; grid-template-columns:minmax(0,1fr) 280px; gap:24px; align-items:center;
+    border:1px solid rgba(238,240,242,.1); border-radius:16px; background:#14171c;
   }
-  .panel::before {
-    content:""; position:absolute; left:22px; right:22px; top:0; height:1px;
-    background:linear-gradient(90deg,transparent,rgba(121,213,255,.7),transparent);
-  }
-  .profile { min-width:0; display:flex; align-items:center; gap:15px; }
-  .avatar-wrap {
-    width:68px; height:68px; flex:0 0 68px; padding:4px; border-radius:50%;
-    background:linear-gradient(145deg,#6bcfff,#267cad); box-shadow:0 8px 22px rgba(2,16,27,.38);
-  }
-  .avatar { width:60px; height:60px; display:block; border:3px solid #102f45; border-radius:50%; object-fit:cover; }
+  .profile { min-width:0; display:flex; align-items:center; gap:16px; }
+  .avatar-wrap { width:64px; height:64px; flex:0 0 64px; border-radius:12px; background:#23272e; }
+  .avatar { width:64px; height:64px; display:block; border-radius:12px; object-fit:cover; background:#d9dcdf; }
   .avatar-fallback {
-    width:60px; height:60px; display:flex; align-items:center; justify-content:center;
-    border:3px solid #102f45; border-radius:50%; color:#f8fffd;
-    background:linear-gradient(145deg,#237ca8,#123d59); font-size:24px; font-weight:800;
+    width:64px; height:64px; display:flex; align-items:center; justify-content:center;
+    border-radius:12px; color:#eef0f2; background:#23272e; font-size:24px; font-weight:500;
   }
   .profile-copy { min-width:0; flex:1; }
-  .profile-kicker { margin-bottom:5px; color:#8bb1c3; font-size:9px; font-weight:800; letter-spacing:1.35px; }
+  .profile-kicker { display:flex; align-items:center; gap:8px; margin-bottom:4px; color:#a3a9b2; font-size:12px; }
+  .profile-kicker::before { content:""; width:16px; height:2px; background:#e65b64; }
   .name-line { display:flex; align-items:baseline; min-width:0; }
   .name {
-    min-width:0; max-width:340px; overflow:hidden; color:#f7fbfc; font-size:23px; line-height:1.15;
-    font-weight:800; letter-spacing:-.4px; text-overflow:ellipsis; white-space:nowrap;
+    min-width:0; max-width:340px; overflow:hidden; font-size:24px; line-height:1.2;
+    font-weight:500; text-overflow:ellipsis; white-space:nowrap;
   }
-  .name-suffix { flex:0 0 auto; color:#afc8d4; font-size:16px; font-weight:600; white-space:nowrap; }
-  .chips { display:flex; align-items:center; gap:6px; margin-top:8px; flex-wrap:wrap; }
+  .name-suffix { flex:0 0 auto; color:#a3a9b2; font-size:16px; font-weight:400; white-space:nowrap; }
+  .chips { display:flex; align-items:center; gap:12px; margin-top:8px; flex-wrap:wrap; }
   .chip {
-    display:inline-flex; align-items:center; gap:5px; height:21px; padding:0 8px; border-radius:6px;
-    color:#c1d8e3; background:rgba(255,255,255,.08); font-size:9px; font-weight:700;
+    display:inline-flex; align-items:center; gap:8px; color:#a3a9b2; background:transparent;
+    font-size:12px; font-weight:400; font-variant-numeric:tabular-nums;
   }
-  .chip i { width:6px; height:6px; border-radius:50%; }
-  .mileage { display:flex; align-items:baseline; justify-content:flex-end; gap:15px; white-space:nowrap; }
-  .mileage span { color:#9bb6c4; font-size:14px; font-weight:600; }
-  .mileage strong { color:#8de4b0; font-size:28px; line-height:1; font-weight:800; letter-spacing:-.6px; }
-  .mileage small { margin-left:5px; color:#a7c6b7; font-size:12px; font-weight:600; }
+  .chip i { width:8px; height:8px; border-radius:50%; }
+  .mileage { display:flex; align-items:baseline; justify-content:flex-end; gap:16px; white-space:nowrap; }
+  .mileage span { color:#a3a9b2; font-size:14px; }
+  .mileage strong { font-size:32px; line-height:1; font-weight:500; font-variant-numeric:tabular-nums; }
+  .mileage small { margin-left:4px; color:#a3a9b2; font-size:14px; font-weight:400; }
 </style>
 <div class="shell">
   <div class="map-grid {% if map_groups|length == 1 %}single{% else %}dual{% endif %}">
@@ -6290,7 +6102,7 @@ class TmpBotPlugin(Star):
         {% if avatar %}<img class="avatar" src="{{ avatar|e }}" />{% else %}<div class="avatar-fallback">{{ avatar_initial|e }}</div>{% endif %}
       </div>
       <div class="profile-copy">
-        <div class="profile-kicker">COMBINED DAILY TRACE</div>
+        <div class="profile-kicker">今日足迹 · 多服务器</div>
         <div class="name-line">
           <div class="name">{{ player_name|e }}</div>
           <span class="name-suffix"> 的今日行驶足迹</span>
@@ -6355,7 +6167,7 @@ class TmpBotPlugin(Star):
       });
       if(focus.length){L.circleMarker(focus[0],{radius:6,color:'#fff',weight:2,fillColor:'#59c98d',fillOpacity:1}).addTo(map);L.circleMarker(focus[focus.length-1],{radius:6,color:'#fff',weight:2,fillColor:'#ef655e',fillOpacity:1}).addTo(map);panelFocus=panelFocus.concat(focus);}
     });
-    if(panelFocus.length===1){map.setView(panelFocus[0],7);}else if(panelFocus.length>1){map.fitBounds(L.latLngBounds(panelFocus),{paddingTopLeft:[45,60],paddingBottomRight:[45,145],maxZoom:8});}
+    if(panelFocus.length===1){map.setView(panelFocus[0],7);}else if(panelFocus.length>1){map.fitBounds(L.latLngBounds(panelFocus),{paddingTopLeft:[44,60],paddingBottomRight:[44,144],maxZoom:8});}
     setTimeout(function(){map.invalidateSize();},80);
   });
 </script>
