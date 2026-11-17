@@ -4790,12 +4790,11 @@ class TmpBotPlugin(Star):
     ets: {
       tileUrl: {{ tile_url_ets|tojson }},
       fallbackUrl: 'https://ets_tiles.cnly.top/20260903/tmp-ets-yellow/Tiles/{z}/{x}/{y}.png',
-      multipliers: { x: 70272, y: 76157 },
       breakpoints: { uk: { x: -31056.8, y: -5832.867 } },
       bounds: { x:131072, y:131072 },
       maxZoom: 8, minZoom: 2,
       calc: function(xx, yy) {
-        return [ xx / 1.609055 + cfg.ets.multipliers.x, yy / 1.609055 + cfg.ets.multipliers.y ];
+        return [ xx / 1.609055, yy / 1.609055 ];
       }
     },
     promods: {
@@ -5393,12 +5392,11 @@ class TmpBotPlugin(Star):
     ets: {
       tileUrl: {{ tile_url_ets|tojson }},
       fallbackUrl: 'https://ets2.online/map/ets2map_158/{z}/{x}/{y}.png',
-      multipliers: { x: 70272, y: 76157 },
       breakpoints: { uk: { x: -31056.8, y: -5832.867 } },
       bounds: { x:131072, y:131072 },
       maxZoom: 8, minZoom: 2,
       calc: function(xx, yy) {
-        return [ xx / 1.609055 + cfg.ets.multipliers.x, yy / 1.609055 + cfg.ets.multipliers.y ];
+        return [ xx / 1.609055, yy / 1.609055 ];
       }
     },
     promods: {
@@ -6313,8 +6311,8 @@ class TmpBotPlugin(Star):
   var cfg = {
     ets: {
       fallbackUrl:'https://ets_tiles.cnly.top/20260903/tmp-ets-yellow/Tiles/{z}/{x}/{y}.png',
-      multipliers:{x:70272,y:76157}, bounds:{x:131072,y:131072}, maxZoom:8, minZoom:2,
-      calc:function(xx,yy){return [xx/1.609055+cfg.ets.multipliers.x,yy/1.609055+cfg.ets.multipliers.y];}
+      bounds:{x:131072,y:131072}, maxZoom:8, minZoom:2,
+      calc:function(xx,yy){return [xx/1.609055,yy/1.609055];}
     },
     promods: {
       fallbackUrl:'https://ets2.online/map/ets2mappromods_156/{z}/{x}/{y}.png',
