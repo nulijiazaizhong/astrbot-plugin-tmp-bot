@@ -444,7 +444,7 @@ def _format_timestamp_to_beijing(timestamp_str: Optional[str]) -> str:
         return s
 
 def _normalize_heading_to_direction(heading: Any) -> Optional[str]:
-    """把角度值转换为方向字符串，如 0°≈北、90°≈东，并附带箭头符号。"""
+    """把弧度航向转换为方向字符串，如 0≈北、π/2≈东，并附带箭头符号。"""
     if heading is None:
         return None
     try:
@@ -460,7 +460,7 @@ def _normalize_heading_to_direction(heading: Any) -> Optional[str]:
             if not heading:
                 return None
             heading = float(heading)
-        angle = float(heading)
+        angle = math.degrees(float(heading))
         if math.isnan(angle) or math.isinf(angle):
             return None
         normalized = ((angle % 360) + 360) % 360
@@ -2432,6 +2432,7 @@ class TmpBotPlugin(Star):
                             'serverCode': server_details.get('code') or server_details.get('shortname'),
                             'x': online_data.get('x'),
                             'y': online_data.get('y'),
+                            'heading': online_data.get('heading'),
                             'country': country_cn or str(country or '').strip(),
                             'realName': location_cn,
                             'locationType': location_type,
